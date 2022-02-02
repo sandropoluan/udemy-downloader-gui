@@ -1718,10 +1718,11 @@ function loginWithUdemy() {
   session.defaultSession.webRequest.onBeforeSendHeaders(
     { urls: ["*://*.udemy.com/*"] },
     function(request, callback) {
-      if (request.requestHeaders.Authorization) {
+      var access_token = getCookie( 'access_token', request.requestHeaders.Cookie);
+      if (access_token) {
         settings.set(
           "access_token",
-          request.requestHeaders.Authorization.split(" ")[1]
+          access_token,
         );
         settings.set("subdomain", new URL(request.url).hostname.split(".")[0]);
         udemyLoginWindow.destroy();

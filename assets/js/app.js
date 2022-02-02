@@ -332,40 +332,44 @@ $(".ui.dashboard .content").on(
                     var videoQuality = v.asset.asset_type;
                     var type = "File";
                   } else {
-                    var type = "Video";
-                    var lecture = response.asset.stream_urls;
-                    var qualities = [];
-                    var qualitySrcMap = {};
-                    lecture.Video.forEach(function(val) {
-                      if (val.label == "Auto") return;
-                      qualities.push(val.label);
-                      qualitySrcMap[val.label] = val.file;
-                    });
-                    var lowest = Math.min(...qualities);
-                    var highest = Math.max(...qualities);
-                    var videoQuality = settingsCached.download.videoQuality;
-                    if (!videoQuality || videoQuality == "Auto") {
-                      var src = lecture.Video[0].file;
-                      videoQuality = lecture.Video[0].label;
-                    } else {
-                      switch (videoQuality) {
-                        case "Highest":
-                          var src = qualitySrcMap[highest];
-                          videoQuality = highest;
-                          break;
-                        case "Lowest":
-                          var src = qualitySrcMap[lowest];
-                          videoQuality = lowest;
-                          break;
-                        default:
-                          videoQuality = videoQuality.slice(0, -1);
-                          if (qualitySrcMap[videoQuality]) {
-                            var src = qualitySrcMap[videoQuality];
-                          } else {
-                            var src = lecture.Video[0].file;
-                            videoQuality = lecture.Video[0].label;
-                          }
+                    try {
+                      var type = "Video";
+                      var lecture = response.asset.stream_urls;
+                      var qualities = [];
+                      var qualitySrcMap = {};
+                      ((lecture || {}).Video || []).forEach(function(val) {
+                        if (val.label == "Auto") return;
+                        qualities.push(val.label);
+                        qualitySrcMap[val.label] = val.file;
+                      });
+                      var lowest = Math.min(...qualities);
+                      var highest = Math.max(...qualities);
+                      var videoQuality = settingsCached.download.videoQuality;
+                      if ((!videoQuality || videoQuality == "Auto") && lecture) {
+                        var src = lecture.Video[0].file;
+                        videoQuality = lecture.Video[0].label;
+                      } else {
+                        switch (videoQuality) {
+                          case "Highest":
+                            var src = qualitySrcMap[highest];
+                            videoQuality = highest;
+                            break;
+                          case "Lowest":
+                            var src = qualitySrcMap[lowest];
+                            videoQuality = lowest;
+                            break;
+                          default:
+                            videoQuality = videoQuality.slice(0, -1);
+                            if (qualitySrcMap[videoQuality]) {
+                              var src = qualitySrcMap[videoQuality];
+                            } else if(lecture) {
+                              var src = lecture.Video[0].file;
+                              videoQuality = lecture.Video[0].label;
+                            }
+                        }
                       }
+                    } catch (e) {
+                      alert('error: '+ e);
                     }
                   }
                   coursedata["chapters"][chapterindex]["lectures"][
@@ -462,6 +466,9 @@ $(".ui.dashboard .content").on(
                       }
                     }
                   }
+                },
+                error: function (error){
+                  alert(error);
                 }
               });
             }

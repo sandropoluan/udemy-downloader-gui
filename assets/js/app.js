@@ -1715,6 +1715,12 @@ function loginWithUdemy() {
     modal: true
   });
 
+  function getCookie(name, cookie) {
+    const value = `; ${cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+
   session.defaultSession.webRequest.onBeforeSendHeaders(
     { urls: ["*://*.udemy.com/*"] },
     function(request, callback) {

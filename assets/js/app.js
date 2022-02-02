@@ -1761,7 +1761,7 @@ function checkLogin() {
       type: "GET",
       url: `https://${settings.get(
         "subdomain"
-      )}.udemy.com/api-2.0/users/me/subscribed-courses?page_size=50`,
+      ) || 'www'}.udemy.com/api-2.0/users/me/subscribed-courses?page_size=50`,
       beforeSend: function() {
         $(".ui.dashboard .courses.dimmer").addClass("active");
       },
